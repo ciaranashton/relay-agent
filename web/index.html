@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relay Agent — How It Works</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="progress-bar">
+    <div class="progress-fill"></div>
+  </nav>
+
+  <div class="slides">
+
+    <!-- 1. TITLE -->
+    <section class="slide slide--title" data-theme="dark">
+      <div class="slide__content">
+        <div class="logo">
+          <div class="logo__icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="24" width="16" height="16" rx="3" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="24" y="14" width="16" height="36" rx="4" stroke="var(--accent)" stroke-width="2.5"/>
+              <rect x="44" y="8" width="16" height="16" rx="3" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="44" y="40" width="16" height="16" rx="3" stroke="currentColor" stroke-width="2.5"/>
+              <line x1="20" y1="32" x2="24" y2="32" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/>
+              <line x1="40" y1="22" x2="44" y2="16" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/>
+              <line x1="40" y1="42" x2="44" y2="48" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="title">Relay Agent</h1>
+        <p class="subtitle">Config-driven AI agents that sit between<br/>inbound messages and your APIs</p>
+        <div class="badge">Open Source &middot; TypeScript &middot; Vercel AI SDK</div>
+        <div class="hint">Press <kbd>&rarr;</kbd> or click to continue</div>
+      </div>
+    </section>
+
+    <!-- 2. THE PROBLEM -->
+    <section class="slide slide--problem" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">The Problem</span>
+        <h2>Wiring AI agents is repetitive plumbing</h2>
+        <div class="two-col">
+          <div class="col">
+            <p class="dim">Every project needs the same boilerplate:</p>
+            <ul class="checklist checklist--bad">
+              <li>Webhook server &amp; signature verification</li>
+              <li>Message parsing &amp; normalisation</li>
+              <li>LLM provider setup &amp; tool wiring</li>
+              <li>Source adapter connections</li>
+              <li>Action dispatch &amp; error handling</li>
+              <li>Triage logic for human escalation</li>
+            </ul>
+          </div>
+          <div class="col">
+            <div class="code-block code-block--faded">
+              <div class="code-block__header">
+                <span class="code-block__dot"></span>
+                <span class="code-block__dot"></span>
+                <span class="code-block__dot"></span>
+                <span class="code-block__title">src/index.ts</span>
+              </div>
+<pre><code><span class="kw">import</span> { Hono } <span class="kw">from</span> <span class="str">"hono"</span>;
+<span class="kw">import</span> { serve } <span class="kw">from</span> <span class="str">"@hono/node-server"</span>;
+<span class="kw">import</span> { anthropic } <span class="kw">from</span> <span class="str">"@ai-sdk/anthropic"</span>;
+<span class="kw">import</span> {
+  createResendAdapter,
+  createGoogleSheetsSource,
+  createReplyAction,
+  createTriageAction,
+  createLogAction,
+  createRelayAgent,
+} <span class="kw">from</span> <span class="str">"relay-agent"</span>;
+
+<span class="kw">const</span> model = anthropic(<span class="str">"claude-sonnet-4-..."</span>);
+<span class="kw">const</span> sheets = createGoogleSheetsSource({...});
+<span class="kw">const</span> reply = createReplyAction({...});
+<span class="kw">const</span> triage = createTriageAction({...});
+<span class="kw">const</span> agent = createRelayAgent({...});
+<span class="kw">const</span> adapter = createResendAdapter({...});
+
+<span class="kw">const</span> app = <span class="kw">new</span> Hono();
+app.post(<span class="str">"/webhook/resend"</span>, <span class="kw">async</span> (c) => {
+  <span class="cm">// verify, parse, process, catch...</span>
+});
+serve({ fetch: app.fetch, port: 3000 });</code></pre>
+            </div>
+            <p class="dim" style="text-align:center; margin-top: 0.75rem; font-size: 0.85rem;">~80 lines of TypeScript before you write any business logic</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THE SOLUTION -->
+    <section class="slide slide--solution" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">The Solution</span>
+        <h2>One config file. One command.</h2>
+        <div class="terminal">
+          <div class="terminal__bar">
+            <span class="terminal__dot terminal__dot--red"></span>
+            <span class="terminal__dot terminal__dot--yellow"></span>
+            <span class="terminal__dot terminal__dot--green"></span>
+            <span class="terminal__title">Terminal</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__line">
+              <span class="terminal__prompt">$</span>
+              <span class="terminal__cmd" data-typewriter>npx relay-agent start --config relay-agent.config.json</span>
+            </div>
+            <div class="terminal__output">
+              <div class="terminal__out-line delay-1">Expense Tracker running on http://localhost:3000</div>
+              <div class="terminal__out-line delay-2">Webhook endpoint: POST /webhook/resend</div>
+              <div class="terminal__out-line delay-3">Health check:     GET /health</div>
+            </div>
+          </div>
+        </div>
+        <div class="benefits">
+          <div class="benefit">
+            <div class="benefit__icon">{ }</div>
+            <div class="benefit__text"><strong>JSON config</strong><br/><span class="dim">No TypeScript required</span></div>
+          </div>
+          <div class="benefit">
+            <div class="benefit__icon">&dollar;</div>
+            <div class="benefit__text"><strong>Env var substitution</strong><br/><span class="dim">$VAR &rarr; process.env.VAR</span></div>
+          </div>
+          <div class="benefit">
+            <div class="benefit__icon">&gt;_</div>
+            <div class="benefit__text"><strong>Zero boilerplate</strong><br/><span class="dim">Server built in</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ARCHITECTURE -->
+    <section class="slide slide--arch" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">Architecture</span>
+        <h2>The Relay Agent pipeline</h2>
+        <div class="pipeline">
+          <div class="pipeline__stage" data-stage="inbound">
+            <div class="pipeline__box pipeline__box--inbound">
+              <div class="pipeline__box-label">Inbound Adapter</div>
+              <div class="pipeline__box-items">
+                <span class="tag">Email (Resend)</span>
+                <span class="tag">Webhook</span>
+                <span class="tag tag--future">Slack</span>
+                <span class="tag tag--future">WhatsApp</span>
+              </div>
+            </div>
+            <div class="pipeline__desc">Receives &amp; normalises messages</div>
+          </div>
+
+          <div class="pipeline__arrow"><div class="pipeline__arrow-line"></div><div class="pipeline__arrow-head"></div></div>
+
+          <div class="pipeline__stage" data-stage="agent">
+            <div class="pipeline__box pipeline__box--agent">
+              <div class="pipeline__box-label">Relay Agent</div>
+              <div class="pipeline__box-items">
+                <span class="tag tag--core">LLM Engine</span>
+                <span class="tag tag--core">Tool Builder</span>
+                <span class="tag tag--core">Triage Rules</span>
+              </div>
+            </div>
+            <div class="pipeline__desc">The brain — decides what to do</div>
+          </div>
+
+          <div class="pipeline__arrow"><div class="pipeline__arrow-line"></div><div class="pipeline__arrow-head"></div></div>
+
+          <div class="pipeline__fork">
+            <div class="pipeline__stage" data-stage="sources">
+              <div class="pipeline__box pipeline__box--source">
+                <div class="pipeline__box-label">Sources</div>
+                <div class="pipeline__box-items">
+                  <span class="tag">Google Sheets</span>
+                  <span class="tag tag--future">Postgres</span>
+                  <span class="tag tag--future">REST API</span>
+                </div>
+              </div>
+              <div class="pipeline__desc">Query &amp; write data</div>
+            </div>
+            <div class="pipeline__stage" data-stage="actions">
+              <div class="pipeline__box pipeline__box--action">
+                <div class="pipeline__box-label">Actions</div>
+                <div class="pipeline__box-items">
+                  <span class="tag">Reply</span>
+                  <span class="tag">Triage</span>
+                  <span class="tag">Log</span>
+                </div>
+              </div>
+              <div class="pipeline__desc">Reply, escalate, or log</div>
+            </div>
+          </div>
+        </div>
+        <p class="arch-note">Sources and actions are exposed as <strong>LLM tools</strong> &mdash; the AI decides when and how to use them.</p>
+      </div>
+    </section>
+
+    <!-- 5. MESSAGE FLOW -->
+    <section class="slide slide--flow" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">Message Flow</span>
+        <h2>What happens when a message arrives</h2>
+        <div class="flow">
+          <div class="flow__step" data-step="1">
+            <div class="flow__number">1</div>
+            <div class="flow__card">
+              <div class="flow__card-icon">&#9993;</div>
+              <h3>Webhook received</h3>
+              <p>Inbound adapter verifies the signature and parses the raw request into a standardised <code>InboundMessage</code>.</p>
+            </div>
+          </div>
+          <div class="flow__connector"></div>
+          <div class="flow__step" data-step="2">
+            <div class="flow__number">2</div>
+            <div class="flow__card">
+              <div class="flow__card-icon">&#9881;</div>
+              <h3>Engine runs</h3>
+              <p>System prompt is built from config. Sources and actions become LLM tools. The AI model is called with the message.</p>
+            </div>
+          </div>
+          <div class="flow__connector"></div>
+          <div class="flow__step" data-step="3">
+            <div class="flow__number">3</div>
+            <div class="flow__card">
+              <div class="flow__card-icon">&#128269;</div>
+              <h3>Tools execute</h3>
+              <p>The LLM calls tools in a loop &mdash; querying sources, writing data, sending replies &mdash; up to <code>maxSteps</code> rounds.</p>
+            </div>
+          </div>
+          <div class="flow__connector"></div>
+          <div class="flow__step" data-step="4">
+            <div class="flow__number">4</div>
+            <div class="flow__card">
+              <div class="flow__card-icon">&#10003;</div>
+              <h3>Result returned</h3>
+              <p>The engine returns the final text, all tool calls made, and the number of steps taken. The webhook responds <code>200</code>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CONFIG WALKTHROUGH -->
+    <section class="slide slide--config" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">Config File</span>
+        <h2>Anatomy of <code>relay-agent.config.json</code></h2>
+        <div class="config-layout">
+          <div class="config-code">
+            <div class="code-block">
+              <div class="code-block__header">
+                <span class="code-block__dot"></span>
+                <span class="code-block__dot"></span>
+                <span class="code-block__dot"></span>
+                <span class="code-block__title">relay-agent.config.json</span>
+              </div>
+<pre><code>{
+  <span class="key" data-hl="identity">"name"</span>: <span class="str">"Expense Tracker"</span>,
+  <span class="key" data-hl="identity">"description"</span>: <span class="str">"Processes receipts..."</span>,
+  <span class="key" data-hl="identity">"instructions"</span>: <span class="str">"Extract vendor, amount..."</span>,
+
+  <span class="key" data-hl="model">"model"</span>: {
+    <span class="key">"provider"</span>: <span class="str">"anthropic"</span>,
+    <span class="key">"name"</span>: <span class="str">"claude-sonnet-4-20250514"</span>
+  },
+
+  <span class="key" data-hl="inbound">"inbound"</span>: {
+    <span class="key">"type"</span>: <span class="str">"resend"</span>,
+    <span class="key">"webhookSecret"</span>: <span class="str">"$RESEND_WEBHOOK_SECRET"</span>,
+    <span class="key">"apiKey"</span>: <span class="str">"$RESEND_API_KEY"</span>
+  },
+
+  <span class="key" data-hl="sources">"sources"</span>: [{
+    <span class="key">"type"</span>: <span class="str">"google-sheets"</span>,
+    <span class="key">"sheetId"</span>: <span class="str">"$GOOGLE_SHEET_ID"</span>,
+    <span class="key">"tabs"</span>: { <span class="str">"expenses"</span>: <span class="str">"Expenses"</span> }
+  }],
+
+  <span class="key" data-hl="actions">"actions"</span>: [
+    { <span class="key">"type"</span>: <span class="str">"reply"</span>, ... },
+    { <span class="key">"type"</span>: <span class="str">"triage"</span>, ... },
+    { <span class="key">"type"</span>: <span class="str">"log"</span> }
+  ],
+
+  <span class="key" data-hl="triage">"triage"</span>: {
+    <span class="key">"confidenceThreshold"</span>: <span class="num">0.7</span>,
+    <span class="key">"alwaysTriage"</span>: [<span class="str">"refund"</span>, <span class="str">"fraud"</span>]
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="config-annotations">
+            <div class="annotation" data-hl="identity">
+              <div class="annotation__marker" style="--color: var(--blue)"></div>
+              <h4>Identity</h4>
+              <p>Name, description, and instructions become the agent's system prompt. This is the domain logic.</p>
+            </div>
+            <div class="annotation" data-hl="model">
+              <div class="annotation__marker" style="--color: var(--purple)"></div>
+              <h4>Model</h4>
+              <p>Provider is dynamically imported at runtime. Install <code>@ai-sdk/anthropic</code>, <code>@ai-sdk/openai</code>, or <code>@ai-sdk/google</code>.</p>
+            </div>
+            <div class="annotation" data-hl="inbound">
+              <div class="annotation__marker" style="--color: var(--green)"></div>
+              <h4>Inbound</h4>
+              <p>The <code>type</code> maps to a built-in adapter. Remaining fields are passed as options. <code>$VAR</code> references are resolved from environment.</p>
+            </div>
+            <div class="annotation" data-hl="sources">
+              <div class="annotation__marker" style="--color: var(--orange)"></div>
+              <h4>Sources</h4>
+              <p>Data sources become query/write tools the LLM can call. Each type maps to a factory function in the registry.</p>
+            </div>
+            <div class="annotation" data-hl="actions">
+              <div class="annotation__marker" style="--color: var(--pink)"></div>
+              <h4>Actions</h4>
+              <p>Actions the agent can take. Reply sends email, triage escalates to a human, log writes to console.</p>
+            </div>
+            <div class="annotation" data-hl="triage">
+              <div class="annotation__marker" style="--color: var(--yellow)"></div>
+              <h4>Triage</h4>
+              <p>Rules for when the agent should escalate instead of auto-responding. Baked into the system prompt.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. EXAMPLE -->
+    <section class="slide slide--example" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">In Practice</span>
+        <h2>Expense Tracker: end to end</h2>
+        <div class="example-flow">
+          <div class="example-step example-step--in stagger-1">
+            <div class="example-step__icon">&#128231;</div>
+            <div class="example-step__body">
+              <strong>User forwards receipt</strong>
+              <span class="dim">to expenses@domain.com</span>
+            </div>
+          </div>
+          <div class="example-arrow stagger-2">&darr;</div>
+          <div class="example-step example-step--process stagger-2">
+            <div class="example-step__icon">&#9881;</div>
+            <div class="example-step__body">
+              <strong>Agent extracts data</strong>
+              <span class="dim">Vendor: Deliveroo &middot; Amount: &pound;18.50 &middot; Category: Food</span>
+            </div>
+          </div>
+          <div class="example-arrow stagger-3">&darr;</div>
+          <div class="example-step example-step--query stagger-3">
+            <div class="example-step__icon">&#128270;</div>
+            <div class="example-step__body">
+              <strong>Checks for duplicates</strong>
+              <span class="dim">query_google-sheets &rarr; No match found</span>
+            </div>
+          </div>
+          <div class="example-arrow stagger-4">&darr;</div>
+          <div class="example-step example-step--write stagger-4">
+            <div class="example-step__icon">&#128221;</div>
+            <div class="example-step__body">
+              <strong>Logs to Google Sheets</strong>
+              <span class="dim">write_google-sheets &rarr; Row added to Expenses tab</span>
+            </div>
+          </div>
+          <div class="example-arrow stagger-5">&darr;</div>
+          <div class="example-step example-step--action stagger-5">
+            <div class="example-step__icon">&#9993;</div>
+            <div class="example-step__body">
+              <strong>Replies to sender</strong>
+              <span class="dim">"Logged &pound;18.50 from Deliveroo under Food. &pound;142/&pound;300 spent this month."</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. HOW THE REGISTRY WORKS -->
+    <section class="slide slide--registry" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">Under the Hood</span>
+        <h2>The registry pattern</h2>
+        <p class="dim" style="max-width: 36rem;">The <code>type</code> field in your config maps to a factory function. The remaining fields are passed as options. No code required.</p>
+        <div class="registry-grid">
+          <div class="registry-card">
+            <div class="registry-card__header">Config</div>
+            <div class="registry-card__body">
+              <code>{ "type": "resend", "apiKey": "$KEY" }</code>
+            </div>
+          </div>
+          <div class="registry-arrow">&rarr;</div>
+          <div class="registry-card">
+            <div class="registry-card__header">Registry Lookup</div>
+            <div class="registry-card__body">
+              <code>inboundAdapters["resend"]</code>
+            </div>
+          </div>
+          <div class="registry-arrow">&rarr;</div>
+          <div class="registry-card">
+            <div class="registry-card__header">Factory Call</div>
+            <div class="registry-card__body">
+              <code>createResendAdapter({ apiKey })</code>
+            </div>
+          </div>
+        </div>
+        <div class="registry-table">
+          <table>
+            <thead><tr><th>Type String</th><th>Component</th><th>Factory</th></tr></thead>
+            <tbody>
+              <tr><td><code>"resend"</code></td><td>Inbound</td><td><code>createResendAdapter()</code></td></tr>
+              <tr><td><code>"webhook"</code></td><td>Inbound</td><td><code>createWebhookAdapter()</code></td></tr>
+              <tr><td><code>"google-sheets"</code></td><td>Source</td><td><code>createGoogleSheetsSource()</code></td></tr>
+              <tr><td><code>"reply"</code></td><td>Action</td><td><code>createReplyAction()</code></td></tr>
+              <tr><td><code>"triage"</code></td><td>Action</td><td><code>createTriageAction()</code></td></tr>
+              <tr><td><code>"log"</code></td><td>Action</td><td><code>createLogAction()</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. GETTING STARTED -->
+    <section class="slide slide--start" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">Get Started</span>
+        <h2>Three files. That's it.</h2>
+        <div class="steps-grid">
+          <div class="start-step">
+            <div class="start-step__num">1</div>
+            <h3>Create config</h3>
+            <div class="code-inline">relay-agent.config.json</div>
+            <p class="dim">Define your agent's name, instructions, model, adapters, and actions.</p>
+          </div>
+          <div class="start-step">
+            <div class="start-step__num">2</div>
+            <h3>Add secrets</h3>
+            <div class="code-inline">.env</div>
+            <p class="dim">API keys and credentials. Loaded automatically. <code>$VAR</code> references resolved at startup.</p>
+          </div>
+          <div class="start-step">
+            <div class="start-step__num">3</div>
+            <h3>Run it</h3>
+            <div class="code-inline">npx relay-agent start --config relay-agent.config.json</div>
+            <p class="dim">Server starts, health endpoint live, webhook ready to receive messages.</p>
+          </div>
+        </div>
+        <div class="cta-row">
+          <div class="terminal terminal--small">
+            <div class="terminal__bar">
+              <span class="terminal__dot terminal__dot--red"></span>
+              <span class="terminal__dot terminal__dot--yellow"></span>
+              <span class="terminal__dot terminal__dot--green"></span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__line"><span class="terminal__prompt">$</span> npm install relay-agent @ai-sdk/anthropic</div>
+              <div class="terminal__line"><span class="terminal__prompt">$</span> npx relay-agent start --config relay-agent.config.json</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. PROGRAMMATIC API -->
+    <section class="slide slide--api" data-theme="dark">
+      <div class="slide__content">
+        <span class="slide__label">For Advanced Users</span>
+        <h2>The programmatic API still works</h2>
+        <p class="dim" style="max-width: 36rem;">Config-driven mode is sugar on top. The full library API remains for custom setups, testing, and embedding.</p>
+        <div class="two-col two-col--balanced">
+          <div class="col">
+            <h3 class="col-heading">Config-driven <span class="badge badge--small">New</span></h3>
+            <div class="code-block code-block--compact">
+<pre><code><span class="cm">// Just a JSON file + CLI command</span>
+<span class="cm">// No TypeScript needed</span>
+
+npx relay-agent start \
+  --config relay-agent.config.json</code></pre>
+            </div>
+          </div>
+          <div class="col">
+            <h3 class="col-heading">Programmatic</h3>
+            <div class="code-block code-block--compact">
+<pre><code><span class="kw">import</span> { createRelayAgent } <span class="kw">from</span> <span class="str">"relay-agent"</span>;
+
+<span class="kw">const</span> agent = createRelayAgent({
+  name: <span class="str">"My Agent"</span>,
+  model, sources, actions,
+  <span class="cm">// Full TypeScript control</span>
+});
+
+<span class="kw">const</span> result = <span class="kw">await</span> agent.process(message);</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="slide-nav">
+    <button class="slide-nav__btn slide-nav__btn--prev" aria-label="Previous slide">&larr;</button>
+    <div class="slide-nav__dots"></div>
+    <button class="slide-nav__btn slide-nav__btn--next" aria-label="Next slide">&rarr;</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

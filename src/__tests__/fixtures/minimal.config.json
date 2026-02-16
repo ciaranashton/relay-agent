@@ -1,0 +1,16 @@
+{
+  "name": "Test Agent",
+  "description": "A minimal agent for acceptance tests",
+  "instructions": "Echo back what you receive.",
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-sonnet-4-20250514"
+  },
+  "inbound": {
+    "type": "webhook"
+  },
+  "actions": [
+    { "type": "log" }
+  ],
+  "server": { "port": 0 }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Expense Tracker",
+  "description": "Processes forwarded receipt emails, extracts expense data, logs to Google Sheets, and replies with confirmation and budget status.",
+  "instructions": "You are an expense tracking assistant. When you receive a forwarded receipt email:\n\n1. Extract the vendor name, amount, date, and category from the receipt.\n2. Categories to use: Office Supplies, Software, Travel, Food, Equipment, Other.\n3. Query the expenses tab to check for duplicates (same vendor + amount + date).\n4. If it's a duplicate, reply saying it looks like a duplicate and don't log it.\n5. If it's new, query the budgets tab to check the current monthly budget for that category.\n6. Write the expense to the expenses sheet with columns: Date, Vendor, Amount, Category, Source Email.\n7. Reply to the sender with:\n   - What was logged (vendor, amount, category)\n   - Current spend vs budget for that category this month\n8. Flag if amount > £500 or if the monthly category budget is exceeded.\n\nAlways be concise and professional in replies.",
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-sonnet-4-20250514"
+  },
+  "inbound": {
+    "type": "resend",
+    "webhookSecret": "$RESEND_WEBHOOK_SECRET",
+    "apiKey": "$RESEND_API_KEY"
+  },
+  "sources": [
+    {
+      "type": "google-sheets",
+      "sheetId": "$GOOGLE_SHEET_ID",
+      "credentials": {
+        "clientEmail": "$GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "privateKey": "$GOOGLE_PRIVATE_KEY"
+      },
+      "tabs": { "expenses": "Expenses", "budgets": "Budgets" }
+    }
+  ],
+  "actions": [
+    { "type": "reply", "apiKey": "$RESEND_API_KEY", "fromAddress": "$FROM_EMAIL" },
+    { "type": "triage", "apiKey": "$RESEND_API_KEY", "fromAddress": "$FROM_EMAIL", "triageRecipient": "$TRIAGE_EMAIL" },
+    { "type": "log" }
+  ],
+  "triage": {
+    "confidenceThreshold": 0.7,
+    "alwaysTriage": ["refund", "dispute", "fraud", "chargeback"],
+    "maxAutoReplies": 3,
+    "triageChannel": "email",
+    "includeRecommendation": true
+  },
+  "server": { "port": "$PORT" }
+}
