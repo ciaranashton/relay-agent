@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { resolve } from "node:path";
-import { createApp } from "../cli/server.js";
-import { loadConfig } from "../cli/config-loader.js";
-import { createInboundFromConfig, createActionFromConfig } from "../cli/registry.js";
-import { createRelayAgent } from "../agent.js";
+import { createApp } from "../server.js";
+import { loadConfig } from "../config-loader.js";
+import { createInboundFromConfig, createActionFromConfig } from "../registry.js";
+import { createRelayAgent } from "../../package/agent.js";
 import type { LanguageModel } from "ai";
 
 const FIXTURES = resolve(import.meta.dirname, "fixtures");

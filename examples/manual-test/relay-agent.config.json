@@ -1,0 +1,17 @@
+{
+  "name": "Echo Agent",
+  "description": "A test agent that replies to every inbound message with a short acknowledgment.",
+  "instructions": "You are a friendly test agent. When you receive a message:\n\n1. Log the message using the log action (level: info).\n2. Reply to the sender with a short, friendly response that acknowledges what they wrote.\n3. Keep replies under 2 sentences.\n\nIf the message looks like spam or is empty, just log it and don't reply.",
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-sonnet-4-20250514"
+  },
+  "inbound": {
+    "type": "webhook"
+  },
+  "actions": [
+    { "type": "reply", "apiKey": "$RESEND_API_KEY", "fromAddress": "$FROM_EMAIL" },
+    { "type": "log" }
+  ],
+  "server": { "port": "$PORT" }
+}

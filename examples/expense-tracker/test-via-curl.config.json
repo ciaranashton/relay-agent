@@ -7,9 +7,7 @@
     "name": "claude-sonnet-4-20250514"
   },
   "inbound": {
-    "type": "resend",
-    "webhookSecret": "$RESEND_WEBHOOK_SECRET",
-    "apiKey": "$RESEND_API_KEY"
+    "type": "webhook"
   },
   "sources": [
     {

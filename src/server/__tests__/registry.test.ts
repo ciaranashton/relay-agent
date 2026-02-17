@@ -3,10 +3,10 @@ import {
   createInboundFromConfig,
   createSourceFromConfig,
   createActionFromConfig,
-} from "../cli/registry.js";
+} from "../registry.js";
 
 // Mock the adapters/actions to avoid real dependencies
-vi.mock("../adapters/resend.js", () => ({
+vi.mock("../../package/adapters/resend.js", () => ({
   createResendAdapter: vi.fn((opts) => ({
     name: "resend",
     opts,
@@ -14,14 +14,14 @@ vi.mock("../adapters/resend.js", () => ({
   })),
 }));
 
-vi.mock("../adapters/webhook.js", () => ({
+vi.mock("../../package/adapters/webhook.js", () => ({
   createWebhookAdapter: vi.fn(() => ({
     name: "webhook",
     parseWebhook: vi.fn(),
   })),
 }));
 
-vi.mock("../adapters/google-sheets.js", () => ({
+vi.mock("../../package/adapters/google-sheets.js", () => ({
   createGoogleSheetsSource: vi.fn((opts) => ({
     name: "google-sheets",
     opts,
@@ -29,7 +29,7 @@ vi.mock("../adapters/google-sheets.js", () => ({
   })),
 }));
 
-vi.mock("../actions/reply.js", () => ({
+vi.mock("../../package/actions/reply.js", () => ({
   createReplyAction: vi.fn((opts) => ({
     name: "reply",
     opts,
@@ -37,7 +37,7 @@ vi.mock("../actions/reply.js", () => ({
   })),
 }));
 
-vi.mock("../actions/triage.js", () => ({
+vi.mock("../../package/actions/triage.js", () => ({
   createTriageAction: vi.fn((opts) => ({
     name: "triage",
     opts,
@@ -45,7 +45,7 @@ vi.mock("../actions/triage.js", () => ({
   })),
 }));
 
-vi.mock("../actions/log.js", () => ({
+vi.mock("../../package/actions/log.js", () => ({
   createLogAction: vi.fn(() => ({
     name: "log",
     execute: vi.fn(),
@@ -69,7 +69,7 @@ describe("createInboundFromConfig", () => {
 
   it("strips the type field before passing to factory", async () => {
     const { createResendAdapter } = vi.mocked(
-      await import("../adapters/resend.js"),
+      await import("../../package/adapters/resend.js"),
     );
     createInboundFromConfig({
       type: "resend",

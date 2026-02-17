@@ -1,10 +1,11 @@
-import { createResendAdapter } from "../adapters/resend.js";
-import { createWebhookAdapter } from "../adapters/webhook.js";
-import { createGoogleSheetsSource } from "../adapters/google-sheets.js";
-import { createReplyAction } from "../actions/reply.js";
-import { createTriageAction } from "../actions/triage.js";
-import { createLogAction } from "../actions/log.js";
-import type { InboundAdapter, SourceAdapter, Action } from "../types.js";
+import { createResendAdapter } from "../package/adapters/resend.js";
+import { createWebhookAdapter } from "../package/adapters/webhook.js";
+import { createGoogleSheetsSource } from "../package/adapters/google-sheets.js";
+import { createJsonFileSource } from "../package/adapters/json-file.js";
+import { createReplyAction } from "../package/actions/reply.js";
+import { createTriageAction } from "../package/actions/triage.js";
+import { createLogAction } from "../package/actions/log.js";
+import type { InboundAdapter, SourceAdapter, Action } from "../package/types.js";
 
 type Factory<T> = (options: Record<string, unknown>) => T;
 
@@ -16,6 +17,8 @@ const inboundAdapters: Record<string, Factory<InboundAdapter>> = {
 const sourceAdapters: Record<string, Factory<SourceAdapter>> = {
   "google-sheets": (opts) =>
     createGoogleSheetsSource(opts as Parameters<typeof createGoogleSheetsSource>[0]),
+  "json-file": (opts) =>
+    createJsonFileSource(opts as Parameters<typeof createJsonFileSource>[0]),
 };
 
 const actions: Record<string, Factory<Action>> = {

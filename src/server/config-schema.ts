@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { triageConfigSchema } from "../schema.js";
+import { triageConfigSchema } from "../package/schema.js";
 
 const modelSchema = z.object({
   provider: z.string(),

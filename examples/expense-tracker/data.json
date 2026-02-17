@@ -1,0 +1,11 @@
+{
+  "Expenses": [],
+  "Budgets": [
+    { "Category": "Office Supplies", "Monthly Budget": "200" },
+    { "Category": "Software", "Monthly Budget": "500" },
+    { "Category": "Travel", "Monthly Budget": "1000" },
+    { "Category": "Food", "Monthly Budget": "300" },
+    { "Category": "Equipment", "Monthly Budget": "750" },
+    { "Category": "Other", "Monthly Budget": "150" }
+  ]
+}

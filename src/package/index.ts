@@ -36,6 +36,8 @@ export type { ResendAdapterOptions } from "./adapters/resend.js";
 export { createWebhookAdapter } from "./adapters/webhook.js";
 export { createGoogleSheetsSource } from "./adapters/google-sheets.js";
 export type { GoogleSheetsSourceOptions } from "./adapters/google-sheets.js";
+export { createJsonFileSource } from "./adapters/json-file.js";
+export type { JsonFileSourceOptions } from "./adapters/json-file.js";
 
 // Actions
 export { createReplyAction } from "./actions/reply.js";

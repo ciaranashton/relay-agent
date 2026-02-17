@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { loadConfig } from "../cli/config-loader.js";
+import { loadConfig } from "../config-loader.js";
 
 const testDir = join(tmpdir(), "relay-agent-test-" + Date.now());
 

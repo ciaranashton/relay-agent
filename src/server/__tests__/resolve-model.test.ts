@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { resolveModel } from "../cli/resolve-model.js";
+import { resolveModel } from "../resolve-model.js";
 
 describe("resolveModel", () => {
   it("throws on unknown provider", async () => {
@@ -16,7 +16,7 @@ describe("resolveModel", () => {
 
     // Need to re-import to pick up the mock
     const { resolveModel: freshResolve } = await import(
-      "../cli/resolve-model.js"
+      "../resolve-model.js"
     );
 
     await expect(
@@ -33,7 +33,7 @@ describe("resolveModel", () => {
     }));
 
     const { resolveModel: freshResolve } = await import(
-      "../cli/resolve-model.js"
+      "../resolve-model.js"
     );
     const model = await freshResolve({
       provider: "anthropic",

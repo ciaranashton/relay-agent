@@ -9,7 +9,7 @@ import {
   createSourceFromConfig,
   createActionFromConfig,
 } from "./registry.js";
-import { createRelayAgent } from "../agent.js";
+import { createRelayAgent } from "../package/agent.js";
 import { startServer } from "./server.js";
 
 const USAGE = `

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-const CLI = resolve(import.meta.dirname, "../../dist/cli/index.js");
+const CLI = resolve(import.meta.dirname, "../../../dist/server/index.js");
 const FIXTURES = resolve(import.meta.dirname, "fixtures");
 
 /** Minimal env — just enough to run node, nothing that might leak into $VAR substitution */
